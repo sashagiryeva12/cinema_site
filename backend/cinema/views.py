@@ -11,6 +11,7 @@ from .serializers import (
     CinemaHallSerializer,
     SessionSerializer,
     BookingSerializer,
+    UserSerializer
 )
 
 
@@ -19,7 +20,13 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
 
+class CurrentUserView(generics.RetrieveAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
 
+    def get_object(self):
+        return self.request.user
+    
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all().order_by("id")
     serializer_class = MovieSerializer

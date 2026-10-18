@@ -1,6 +1,24 @@
 from django.db import models
+from django.contrib.auth.models import User
+class Profile(models.Model):
+    ROLE_CHOICES = [
+        ("viewer", "Зритель"),
+        ("admin", "Администратор"),
+    ]
 
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="profile",
+    )
+    role = models.CharField(
+        max_length=10,
+        choices=ROLE_CHOICES,
+        default="viewer",
+    )
 
+    def __str__(self):
+        return f"{self.user.username} — {self.get_role_display()}"
 
 class Movie(models.Model):
     title = models.CharField(max_length=200)

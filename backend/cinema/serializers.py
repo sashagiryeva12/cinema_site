@@ -1,18 +1,41 @@
+
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Movie, CinemaHall, Session, Booking
+from .models import (
+    Profile,
+    Movie,
+    CinemaHall,
+    Session,
+    Booking,
+)
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField(
+        write_only=True,
+        min_length=8,
+    )
 
     class Meta:
         model = User
         fields = ["id", "username", "email", "password"]
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        user = User.objects.create_user(**validated_data)
+        Profile.objects.create(user=user, role="viewer")
+        return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(
+        source="profile.role",
+        read_only=True,
+    )
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "role"]
 
 
 class MovieSerializer(serializers.ModelSerializer):
