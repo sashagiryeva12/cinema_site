@@ -1,9 +1,11 @@
 
-import { Link, Outlet } from 'react-router-dom'
+
+import { Link, Outlet, useNavigate } from 'react-router-dom'
 import AuthButton from './AuthButton'
 import { useAuth } from '../hooks/useAuth'
 export default function Layout() {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <header className="border-b border-slate-800">
@@ -18,18 +20,32 @@ export default function Layout() {
             <Link to="/sessions" className="hover:text-red-400">
               Сеансы
             </Link>
+            {user?.role === 'viewer' && (
             <Link to="/my-bookings" className="hover:text-red-400">
               Мои билеты
             </Link>
+            )}
             <Link to="/profile" className="hover:text-red-400">Профиль</Link>
+            {user?.role === 'admin' && (
+              <>
+                <Link to="/admin" className="hover:text-red-400">
+                  Админ-панель
+                </Link>
+
+                <Link
+                  to="/admin/statistics"
+                  className="hover:text-orange-400"
+                >
+                  Статистика
+                </Link>
+              </>
+            )}
             {user ? (
-              <button
-                onClick={() => {
-                  logout()
-                  window.location.href = '/login'
+              <button onClick={async () => {
+                 await logout()
+                  navigate('/login')
                 }}
-                className="rounded-lg border border-slate-700 px-4 py-2 hover:border-red-500 hover:text-red-400"
-              >
+                className="rounded-lg border border-slate-700 px-4 py-2 hover:border-red-500 hover:text-red-400">
                 Выйти
               </button>
             ) : (

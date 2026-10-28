@@ -1,58 +1,74 @@
-
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import api from '../api/client'
-
-const AuthContext = createContext(null)
+import {
+  setUser,
+  setAuthLoading,
+  clearAuth,
+} from '../store/authSlice'
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-
-  async function loadUser() {
-    const access = localStorage.getItem('access')
-
-    if (!access) {
-      setUser(null)
-      setLoading(false)
-      return
-    }
-
-    try {
-      const response = await api.get('auth/me/')
-      setUser(response.data)
-    } catch (error) {
-      setUser(null)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { reloadUser, logout } = useAuth()
 
   useEffect(() => {
-    loadUser()
-  }, [])
+    reloadUser()
+  }, [reloadUser])
 
-  function logout() {
-    localStorage.removeItem('access')
-    localStorage.removeItem('refresh')
-    setUser(null)
-  }
+  useEffect(() => {
+    window.addEventListener('auth:logout', logout)
 
-  async function login(tokens) {
-    localStorage.setItem('access', tokens.access)
-    localStorage.setItem('refresh', tokens.refresh)
-    setLoading(true)
-    await loadUser()
-  }
+    return () => {
+      window.removeEventListener('auth:logout', logout)
+    }
+  }, [logout])
 
-  return (
-    <AuthContext.Provider
-      value={{ user, loading, login, logout, reloadUser: loadUser }}
-    >
-      {children}
-    </AuthContext.Provider>
-  )
+  return children
 }
 
 export function useAuth() {
-  return useContext(AuthContext)
+  const dispatch = useDispatch()
+  const user = useSelector((state) => state.auth.user)
+  const loading = useSelector((state) => state.auth.loading)
+
+  const reloadUser = useCallback(async () => {
+    const access = localStorage.getItem('access')
+
+    if (!access) {
+      dispatch(setUser(null))
+      dispatch(setAuthLoading(false))
+      return
+    }
+
+    dispatch(setAuthLoading(true))
+
+    try {
+      const response = await api.get('auth/me/')
+      dispatch(setUser(response.data))
+    } catch {
+      dispatch(setUser(null))
+    } finally {
+      dispatch(setAuthLoading(false))
+    }
+  }, [dispatch])
+
+  const login = useCallback(async (tokens) => {
+    localStorage.setItem('access', tokens.access)
+    localStorage.setItem('refresh', tokens.refresh)
+
+    await reloadUser()
+  }, [reloadUser])
+
+  const logout = useCallback(() => {
+    localStorage.removeItem('access')
+    localStorage.removeItem('refresh')
+    dispatch(clearAuth())
+  }, [dispatch])
+
+  return {
+    user,
+    loading,
+    login,
+    logout,
+    reloadUser,
+  }
 }

@@ -11,7 +11,8 @@ from .views import (
     CinemaHallViewSet,
     SessionViewSet,
     BookingViewSet,
-     CurrentUserView
+    CurrentUserView,
+    admin_statistics,
 )
 
 router = DefaultRouter()
@@ -25,5 +26,6 @@ urlpatterns = [
     path("auth/login/", TokenObtainPairView.as_view(), name="login"),
     path("auth/me/", CurrentUserView.as_view(), name="current-user"),
     path("auth/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
+    path("admin/statistics/",admin_statistics,name="admin-statistics"),
     path("", include(router.urls)),
 ]
