@@ -55,7 +55,7 @@ export default function Register() {
       password: form.password,
     }
 
-    // Не отправляем пустой email, если он необязателен на сервере.
+    
     if (!data.email) {
       delete data.email
     }

@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Pencil, PlusCircle, Trash2, X } from 'lucide-react'
-import api from '../api/client'
+import api from '../../api/client'
 
 const schema = z.object({
   movie: z.coerce.number().int().positive('Выбери фильм'),

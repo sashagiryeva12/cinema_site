@@ -20,29 +20,29 @@ export default function App() {
     <AuthProvider>
       <Routes>
         <Route path="/" element={<Layout />}>
-          {/* Публичные страницы */}
+
           <Route index element={<Home />} />
           <Route path="movies" element={<Movies />} />
-          <Route element={<ProtectedRoute allowedRoles={['viewer']} />}>
+          <Route element={<ProtectedRoute allowedRoles={['viewer']}/>}>
             <Route path="booking/:sessionId" element={<Booking />} />
           </Route>
-          <Route path="sessions" element={<Sessions />} />
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
+          <Route path="sessions" element={<Sessions/>} />
+          <Route path="login" element={<Login/>} />
+          <Route path="register" element={<Register/>} />
 
-          {/* Страницы для вошедших пользователей */}
+          
           <Route element={<ProtectedRoute />}>
             <Route path="profile" element={<Profile />} />
           </Route>
 
-          {/* Только для зрителя */}
+        
           <Route element={<ProtectedRoute allowedRoles={['viewer']} />}>
-            <Route path="my-bookings" element={<MyBookings />} />
+            <Route path="my-bookings" element={<MyBookings/>} />
           </Route>
 
-          {/* Только для администратора */}
+        
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-            <Route path="admin" element={<Admin />} />
+            <Route path="admin" element={<Admin/>} />
             <Route path="admin/statistics" element={<AdminDashboard />} />
           </Route>
 
